@@ -1,0 +1,40 @@
+{
+  "name": "express-range",
+  "version": "1.0.0",
+  "description": "Express REST middleware for Content-Range pagination",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/purposeindustries/express-range"
+  },
+  "keywords": [
+    "express",
+    "content-range",
+    "range",
+    "pagination"
+  ],
+  "author": "Purpose Industries <dev@purposeindustries.co>",
+  "contributors": [
+    {
+      "name": "Bence Dányi",
+      "email": "bd@purposeindustries.co"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/purposeindustries/express-range/issues"
+  },
+  "homepage": "https://github.com/purposeindustries/express-range",
+  "dependencies": {
+    "content-range": "git://github.com/madbence/content-range#consistent-naming"
+  },
+  "devDependencies": {
+    "express": "^4.6.1",
+    "mocha": "^1.20.1",
+    "should": "^4.0.4",
+    "supertest": "^0.13.0"
+  }
+}
