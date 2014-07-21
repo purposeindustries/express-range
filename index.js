@@ -49,9 +49,9 @@ module.exports = function middleware(options) {
         }
         res.setHeader('Content-Range', format({
           unit: opts.unit || parsed.unit || accept[0],
-          first: opts.first == undefined ? parsed.first : opts.first,
-          last: opts.last == undefined ? parsed.last : opts.last,
-          length: opts.length == undefined ? length : opts.length
+          first: opts.hasOwnProperty('first') ? opts.first : parsed.first,
+          last: opts.hasOwnProperty('last') ? opts.last : parsed.last,
+          length: opts.hasOwnProperty('length') ? opts.length : parsed.length,
         }));
       };
       next();
