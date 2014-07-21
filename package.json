@@ -4,7 +4,8 @@
   "description": "Express REST middleware for Content-Range pagination",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test-bg": "mocha -w"
   },
   "repository": {
     "type": "git",
@@ -28,13 +29,14 @@
     "url": "https://github.com/purposeindustries/express-range/issues"
   },
   "homepage": "https://github.com/purposeindustries/express-range",
-  "dependencies": {
-    "content-range": "git://github.com/madbence/content-range#consistent-naming"
-  },
   "devDependencies": {
     "express": "^4.6.1",
     "mocha": "^1.20.1",
     "should": "^4.0.4",
     "supertest": "^0.13.0"
+  },
+  "dependencies": {
+    "http-content-range-format": "^1.0.0",
+    "http-range-parse": "^1.0.0"
   }
 }

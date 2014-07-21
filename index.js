@@ -1,53 +1,60 @@
 'use strict';
 
-var contentRange = require('content-range');
-
-function parse(str) {
-  var parts = str.split('=');
-  if(parts.length != 2) {
-    throw new Error('Not valid HTTP range!');
-  }
-  var unit = parts[0];
-  var range = parts[1].split('-');
-  if(range[0] == '') {
-    return {
-      unit: unit,
-      first: -parseInt(range[1], 10)
-    };
-  }
-  return {
-    unit: unit,
-    first: parseInt(range[0], 10),
-    last: parseInt(range[1], 10)
-  };
-}
-
-function extend(obj) {
-  [].slice.call(arguments, 1).forEach(function(o) {
-    Object.keys(o).forEach(function(key) {
-      obj[key] = o[key];
-    });
-  });
-}
+var parse = require('http-range-parse');
+var format = require('http-content-range-format');
 
 module.exports = function middleware(options) {
   options = options || {};
-  var accept = options.accept || 'items';
+  var accept = options.accept || ['items'];
+  if(typeof accept == 'string') {
+    accept = [accept];
+  }
+  var limit = options.limit || 10;
+  var lengthFn = typeof options.length == 'number'
+               ? function(cb) { cb(null, options.length); }
+               : typeof options.length == 'undefined'
+               ? function(cb) { cb(); }
+               : options.length;
   return function contentRange(req, res, next) {
     var parsed = req.headers.range
                ? parse(req.headers.range)
-               : {};
-    req.range = {
-      first: parsed.first || 0,
-      last: parsed.firs < 0 || ((parsed.first || 0) + options.defaultLimit - 1)
-    };
-    res.range = function(opts) {
-      if(available.indexOf(opts.name) === -1) {
-        available.push(opts.name);
+               : accept.length == 1
+               ? {
+                   unit: accept[0],
+                   first: 0,
+                   last: limit - 1
+                 }
+               : null;
+    req.range = parsed;
+    res.setHeader('Accept-Ranges', accept.join(', '));
+    if(req.headers.range) {
+      res.status(206);
+    }
+    lengthFn(function(err, length) {
+      if(err) {
+        return next(err);
       }
-      res.setHeader('Content-Range', contentRange.format(opts));
-      res.setHeader('Accept-Ranges', available.join(', '));
-    };
-    next();
+      if(accept.length == 1 && typeof parsed.first == 'number'
+                            && typeof parsed.last == 'number') {
+        res.setHeader('Content-Range', format({
+          first: parsed.first,
+          last: parsed.last,
+          unit: accept[0],
+          length: length
+        }));
+      }
+      res.range = function(opts) {
+        if(!opts.unit && !parsed && accept.length > 1) {
+          throw new Error('Content-Range unit is ambigous');
+        }
+        res.setHeader('Content-Range', format({
+          unit: opts.unit || parsed.unit || accept[0],
+          first: opts.first == undefined ? parsed.first : opts.first,
+          last: opts.last == undefined ? parsed.last : opts.last,
+          length: opts.length == undefined ? length : opts.length
+        }));
+      };
+      next();
+    });
   };
 };
