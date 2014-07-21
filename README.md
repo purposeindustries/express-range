@@ -1,4 +1,4 @@
-# express-range
+# express-range [![Build Status](https://travis-ci.org/purposeindustries/express-range.svg)](https://travis-ci.org/purposeindustries/express-range)
 
 Express middleware for handling `Range`, `Content-Range`, and `Accept-Ranges` headers.
 
